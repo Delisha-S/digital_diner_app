@@ -17,16 +17,14 @@ coverage/
 .swiftpm/
 migrate_working_dir/
 
-# IntelliJ related
+# IDEs
 *.iml
 *.ipr
 *.iws
 .idea/
-
-# VS Code (optional)
 #.vscode/
 
-# Flutter/Dart/Pub
+# Flutter/Dart
 **/doc/api/
 **/ios/Flutter/.last_build_id
 .dart_tool/
@@ -36,13 +34,30 @@ migrate_working_dir/
 build/
 coverage/
 
-# Symbolication
-app.*.symbols
-
-# Obfuscation
-app.*.map.json
-
-# Android Studio artifacts
+# Android
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# iOS
+ios/Flutter/Flutter-*.xcconfig
+ios/Flutter/AppFrameworkInfo.plist
+ios/Runner/GeneratedPluginRegistrant.*
+
+# Windows
+windows/flutter/generated_*
+windows/runner/*.o
+windows/runner/*.obj
+
+# Linux
+linux/flutter/generated_*
+linux/runner/*.o
+linux/runner/*.obj
+
+# macOS
+macos/Flutter/Flutter-*.xcconfig
+macos/Runner/GeneratedPluginRegistrant.*
+
+# Other
+app.*.symbols
+app.*.map.json
