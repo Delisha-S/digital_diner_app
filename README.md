@@ -1,16 +1,27 @@
 # digital_diner_app
 
-A new Flutter project.
+A Flutter desktop app (Windows). This repo contains the Flutter project and a GitHub Actions workflow that builds a Windows release artifact.
 
-## Getting Started
+## Local development (Windows)
 
-This project is a starting point for a Flutter application.
+1. Open "x64 Native Tools Command Prompt" or a Developer Command Prompt for Visual Studio.
+2. From the project root:
+   ```
+   flutter pub get
+   flutter run -d windows
+   ```
+3. To build a release:
+   ```
+   flutter build windows --release
+   ```
+   The built exe is at `build/windows/x64/runner/Release/digital_diner_app.exe`.
 
-A few resources to get you started if this is your first Flutter project:
+## CI
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+This repo can use GitHub Actions to build a Windows release on pushes and pull requests to `main`. The workflow can upload the built Release folder as an artifact.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Notes
+
+- Do NOT store secrets (API keys) in the repository. Use environment variables and GitHub Secrets.
+- If you integrate an AI backend, keep provider keys only on the backend and not in the Flutter client.
+- See `.github/workflows/build-windows.yml` for CI configuration (create it if you want automated builds).
