@@ -1,27 +1,54 @@
+[![Release](https://img.shields.io/github/v/release/Delisha-S/digital_diner_app)](https://github.com/Delisha-S/digital_diner_app/releases/latest)
+[![Build](https://github.com/Delisha-S/digital_diner_app/actions/workflows/build-windows.yml/badge.svg)](https://github.com/Delisha-S/digital_diner_app/actions)
+
 # digital_diner_app
 
-A Flutter desktop app (Windows). This repo contains the Flutter project and a GitHub Actions workflow that builds a Windows release artifact.
+A Flutter desktop app for Windows.
 
-## Local development (Windows)
+## Download
 
-1. Open "x64 Native Tools Command Prompt" or a Developer Command Prompt for Visual Studio.
-2. From the project root:
-   ```
+Get the latest packaged build from Releases:
+https://github.com/Delisha-S/digital_diner_app/releases/latest
+
+## Quickstart (Windows, development)
+
+1. Install Flutter and enable Windows desktop:
+   ```bash
+   flutter doctor
+   flutter config --enable-windows-desktop
    flutter pub get
    flutter run -d windows
    ```
-3. To build a release:
-   ```
+
+2. To build a Release executable:
+   ```bash
    flutter build windows --release
    ```
-   The built exe is at `build/windows/x64/runner/Release/digital_diner_app.exe`.
+   The release exe will be at:
+   `build/windows/x64/runner/Release/digital_diner_app.exe`
 
-## CI
+## Run the downloaded release
+1. Download and unzip `digital_diner_app-windows-release.zip` from Releases.
+2. Unblock the exe (if Windows blocks it):
+   ```powershell
+   Unblock-File .\digital_diner_app.exe
+   ```
+3. Run:
+   ```powershell
+   .\digital_diner_app.exe
+   ```
 
-This repo can use GitHub Actions to build a Windows release on pushes and pull requests to `main`. The workflow can upload the built Release folder as an artifact.
+## Troubleshooting
 
-## Notes
+- If the app fails to start with a missing DLL (e.g., `VCRUNTIME140_1.dll`), install the Visual C++ Redistributable (x64):
+  https://learn.microsoft.com/cpp/windows/latest-supported-vc-redist
 
-- Do NOT store secrets (API keys) in the repository. Use environment variables and GitHub Secrets.
-- If you integrate an AI backend, keep provider keys only on the backend and not in the Flutter client.
-- See `.github/workflows/build-windows.yml` for CI configuration (create it if you want automated builds).
+- If CI build fails, check the Actions run logs: https://github.com/Delisha-S/digital_diner_app/actions
+
+## Contributing
+
+Contributions are welcome. For small changes you can edit files directly on GitHub and open a PR. Please add issues for larger work.
+
+## License
+
+Add your license here (e.g., MIT). If you don’t have one yet, consider adding a LICENSE file.
