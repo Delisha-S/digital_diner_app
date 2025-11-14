@@ -4,7 +4,7 @@ import '../services/ai_service.dart';
 
 class AIChatWidget extends StatefulWidget {
   final String? userId;
-  const AIChatWidget({Key? key, this.userId}) : super(key: key);
+  const AIChatWidget({super.key, this.userId});
 
   @override
   State<AIChatWidget> createState() => _AIChatWidgetState();
