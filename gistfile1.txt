@@ -1,0 +1,264 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(DigitalDinerApp());
+}
+
+class DigitalDinerApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(home: InputScreen(), debugShowCheckedModeBanner: false);
+  }
+}
+
+// ---------------------------------------------------------
+// SCREEN 1 — User Input
+// ---------------------------------------------------------
+class InputScreen extends StatelessWidget {
+  final TextEditingController inputController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color(0xFFD9F5C4),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(25),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Logo / App Title
+              Text(
+                "Digital Diner",
+                style: TextStyle(
+                  fontSize: 34,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green[800],
+                ),
+              ),
+              SizedBox(height: 40),
+
+              // Search Bar
+              TextField(
+                controller: inputController,
+                decoration: InputDecoration(
+                  hintText: "I want to eat...",
+                  filled: true,
+                  fillColor: Color(0xFFAED7C1),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 20),
+
+              // SEARCH BUTTON
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFF5F7F45),
+                  ),
+                  child: Text("Search"),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            SuggestionsScreen(userInput: inputController.text),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+class SuggestionsScreen extends StatefulWidget {
+  final String userInput;
+
+  SuggestionsScreen({required this.userInput});
+
+  @override
+  _SuggestionsScreenState createState() => _SuggestionsScreenState();
+}
+
+class _SuggestionsScreenState extends State<SuggestionsScreen> {
+  TextEditingController searchController = TextEditingController();
+  List<String> suggestions = [
+    "Thai Food",
+    "Sushi Bar",
+    "BBQ",
+    "Mexican Tacos",
+    "Vegan Cafe",
+  ];
+
+  List<String> favorites = [];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color(0xFFD9F5C4),
+      appBar: AppBar(
+        backgroundColor: Color(0xFFD9F5C4),
+        elevation: 1,
+        title: Text("Suggestions", style: TextStyle(color: Colors.black)),
+        iconTheme: IconThemeData(color: Colors.black),
+
+        actions: [
+          IconButton(
+            icon: Icon(Icons.favorite, color: Colors.red),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FavoritesScreen(favorites: favorites),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+
+      body: Padding(
+        padding: const EdgeInsets.all(25),
+        child: Column(
+          children: [
+            // SEARCH BAR ON SCREEN 2
+            TextField(
+              controller: searchController,
+              decoration: InputDecoration(
+                hintText: "Search again...",
+                filled: true,
+                fillColor: Color(0xFFAED7C1),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+
+            SizedBox(height: 15),
+
+            // SEARCH BUTTON (STAYS ON SCREEN 2)
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF5F7F45),
+                ),
+                child: Text("Search"),
+                onPressed: () {
+                  setState(() {
+                    suggestions.shuffle();
+                  });
+                },
+              ),
+            ),
+
+            SizedBox(height: 20),
+
+            // KEEP ALL SUGGESTIONS ON SCREEN
+            Expanded(
+              child: ListView.builder(
+                itemCount: suggestions.length,
+                itemBuilder: (context, index) {
+                  final suggestion = suggestions[index];
+                  final isFav = favorites.contains(suggestion);
+
+                  return Container(
+                    margin: EdgeInsets.only(bottom: 12),
+                    padding: EdgeInsets.all(18),
+                    decoration: BoxDecoration(
+                      color: Color(0xFFAED7C1),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          suggestion,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.green[900],
+                          ),
+                        ),
+
+                        IconButton(
+                          icon: Icon(
+                            isFav ? Icons.favorite : Icons.favorite_border,
+                            color: Colors.red,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              isFav
+                                  ? favorites.remove(suggestion)
+                                  : favorites.add(suggestion);
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class FavoritesScreen extends StatelessWidget {
+  final List<String> favorites;
+
+  FavoritesScreen({required this.favorites});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color(0xFFD9F5C4),
+      appBar: AppBar(
+        backgroundColor: Color(0xFFD9F5C4),
+        elevation: 1,
+        title: Text("Favorites", style: TextStyle(color: Colors.black)),
+        iconTheme: IconThemeData(color: Colors.black),
+      ),
+
+      body: Padding(
+        padding: const EdgeInsets.all(25),
+        child: favorites.isEmpty
+            ? Center(child: Text("No favorites yet"))
+            : ListView.builder(
+                itemCount: favorites.length,
+                itemBuilder: (context, index) {
+                  return Container(
+                    margin: EdgeInsets.only(bottom: 12),
+                    padding: EdgeInsets.all(18),
+                    decoration: BoxDecoration(
+                      color: Color(0xFFAED7C1),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Text(
+                      favorites[index],
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.green[900],
+                      ),
+                    ),
+                  );
+                },
+              ),
+      ),
+    );
+  }
+}
