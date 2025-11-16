@@ -11,9 +11,7 @@ class DigitalDinerApp extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------
-// SCREEN 1 — User Input
-// ---------------------------------------------------------
+// WIREFRAME 1 — User Input
 class InputScreen extends StatelessWidget {
   final TextEditingController inputController = TextEditingController();
 
@@ -80,7 +78,7 @@ class InputScreen extends StatelessWidget {
   }
 }
 
-
+// WIREFRAME 2 — Suggestions + Search Bar + Heart Icon
 class SuggestionsScreen extends StatefulWidget {
   final String userInput;
 
@@ -94,10 +92,18 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
   TextEditingController searchController = TextEditingController();
   List<String> suggestions = [
     "Thai Food",
-    "Sushi Bar",
     "BBQ",
+    "Asian Fusion",
+    "Sushi Bar",
     "Mexican Tacos",
     "Vegan Cafe",
+    "Italian",
+    "Mediterranean",
+    "Indian",
+    "Korean BBQ",
+    "Chinese",
+    "Burger Joint",
+    "Dessert Cafe",
   ];
 
   List<String> favorites = [];
@@ -217,6 +223,7 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
   }
 }
 
+//   WIREFRAME 3 — Favorites
 class FavoritesScreen extends StatelessWidget {
   final List<String> favorites;
 
