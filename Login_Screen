@@ -1,0 +1,579 @@
+//Login Screen by Saipraanv Viswanathan
+//Sunday november 15th, 2025
+
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const DigitalDinerApp());
+}
+
+bool hasAccount = false;
+String? createdUsername;
+String? createdPassword;
+bool requireValidation = false;
+
+class DigitalDinerApp extends StatelessWidget {
+  const DigitalDinerApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Digital Diner',
+      debugShowCheckedModeBanner: false,
+      home: const AccessFavoriteScreen(),
+    );
+  }
+}
+
+const Color bgColor = Color(0xFFDFFFD6);
+const Color buttonColor = Color(0xFF6B7D52);
+
+Widget customButton(String text, VoidCallback onTap, {double width = 200}) {
+  return SizedBox(
+    width: width,
+    child: ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: buttonColor,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+      onPressed: onTap,
+      child: Text(text),
+    ),
+  );
+}
+
+Widget loginField(TextEditingController controller, String hint, bool error,
+    {bool obscure = false}) {
+  return Container(
+    margin: const EdgeInsets.symmetric(vertical: 10),
+    width: 260,
+    child: TextField(
+      controller: controller,
+      obscureText: obscure,
+      decoration: InputDecoration(
+        hintText: hint,
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide:
+              BorderSide(color: error ? Colors.red : Colors.black54, width: error ? 2 : 1),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide:
+              BorderSide(color: error ? Colors.red : buttonColor, width: error ? 2 : 2),
+        ),
+      ),
+    ),
+  );
+}
+
+class AccessFavoriteScreen extends StatelessWidget {
+  const AccessFavoriteScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: bgColor,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text("Digital\nDiner",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 40),
+            customButton("Login", () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const LoginScreen()));
+            }),
+            const SizedBox(height: 15),
+            customButton("Sign Up", () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const SignupScreen()));
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key});
+
+  @override
+  State<SignupScreen> createState() => _SignupScreenState();
+}
+
+class _SignupScreenState extends State<SignupScreen> {
+  final TextEditingController usernameCtrl = TextEditingController();
+  final TextEditingController passwordCtrl = TextEditingController();
+  bool obscure = true;
+
+  void createAccountAndReturn() {
+    createdUsername = usernameCtrl.text.trim();
+    createdPassword = passwordCtrl.text.trim();
+    hasAccount = true;
+    requireValidation = true;
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Account created — please log in.")),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: bgColor,
+      body: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const Text("Sign Up",
+                  style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 30),
+              Container(
+                width: 260,
+                margin: const EdgeInsets.only(bottom: 10),
+                child: TextField(
+                  controller: usernameCtrl,
+                  decoration: InputDecoration(
+                    hintText: "Create a username",
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
+                ),
+              ),
+              Container(
+                width: 260,
+                child: TextField(
+                  controller: passwordCtrl,
+                  obscureText: obscure,
+                  decoration: InputDecoration(
+                    hintText: "Create a password",
+                    filled: true,
+                    fillColor: Colors.white,
+                    suffixIcon: IconButton(
+                      icon: Icon(obscure ? Icons.visibility_off : Icons.visibility),
+                      onPressed: () => setState(() => obscure = !obscure),
+                    ),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              customButton("Sign Up", () {
+                if (usernameCtrl.text.trim().isEmpty ||
+                    passwordCtrl.text.trim().isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Please fill all fields.")),
+                  );
+                  return;
+                }
+                createAccountAndReturn();
+              }),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen>
+    with SingleTickerProviderStateMixin {
+  final TextEditingController usernameCtrl = TextEditingController();
+  final TextEditingController passwordCtrl = TextEditingController();
+
+  late AnimationController shakeController;
+  late Animation<double> shakeAnimation;
+  bool showError = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    shakeController =
+        AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
+
+    shakeAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: -8.0), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: -8.0, end: 8.0), weight: 2),
+      TweenSequenceItem(tween: Tween(begin: 8.0, end: -6.0), weight: 2),
+      TweenSequenceItem(tween: Tween(begin: -6.0, end: 6.0), weight: 2),
+      TweenSequenceItem(tween: Tween(begin: 6.0, end: 0.0), weight: 1),
+    ]).animate(CurvedAnimation(
+      parent: shakeController,
+      curve: Curves.easeOut,
+    ));
+  }
+
+  void runError() {
+    setState(() => showError = true);
+    shakeController.forward(from: 0);
+  }
+
+  void validateLogin() {
+    final u = usernameCtrl.text.trim();
+    final p = passwordCtrl.text.trim();
+
+    if (!hasAccount) {
+      runError();
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("No account found. Please sign up first.")));
+      return;
+    }
+
+    if (requireValidation) {
+      if (u == createdUsername && p == createdPassword) {
+        requireValidation = false;
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const UserProfileScreen()),
+        );
+      } else {
+        runError();
+      }
+      return;
+    }
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const UserProfileScreen()),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: bgColor,
+      body: Center(
+        child: AnimatedBuilder(
+          animation: shakeController,
+          builder: (context, child) {
+            final offset = shakeAnimation.value;
+            return Transform.translate(offset: Offset(offset, 0), child: child);
+          },
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                const Text("Log In",
+                    style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 30),
+                loginField(usernameCtrl, "Username", showError),
+                loginField(passwordCtrl, "Password", showError, obscure: true),
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
+                    );
+                  },
+                  child: const Text("Forgot Password?",
+                      style: TextStyle(color: Colors.black)),
+                ),
+                const SizedBox(height: 10),
+                customButton("Log In", validateLogin),
+                const SizedBox(height: 20),
+                customButton("New User? Sign Up", () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const SignupScreen()),
+                  );
+                }),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class UserProfileScreen extends StatelessWidget {
+  const UserProfileScreen({super.key});
+
+  Widget tile(String text, IconData icon) {
+    return Container(
+      width: 320,
+      padding: const EdgeInsets.all(15),
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(children: [
+        Icon(icon),
+        const SizedBox(width: 12),
+        Expanded(child: Text(text)),
+      ]),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFC5E1A5),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              Text(createdUsername ?? "User",
+                  style:
+                      const TextStyle(fontSize: 36, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 25),
+              tile("Premium Member", Icons.star_border),
+              tile("4 Restaurants visited", Icons.location_on_outlined),
+              tile("Join dining group", Icons.group_add_outlined),
+              tile("My availability", Icons.calendar_month_outlined),
+              const SizedBox(height: 20),
+              customButton("Back to Dining Search", () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => const DiningSearchScreen()),
+                );
+              }, width: 260),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------
+// DINING SEARCH SCREEN (updated & styled)
+// ---------------------------------------------
+
+class DiningSearchScreen extends StatelessWidget {
+  const DiningSearchScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFDFFFD6),
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 10),
+
+                  const Text(
+                    "Digital\nDiner",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 48,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.black87,
+                    ),
+                  ),
+
+                  const SizedBox(height: 30),
+
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Digital Diner",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  Container(
+                    width: 260,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      color: Color(0xFFC9E7FF),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                    child: const Center(
+                      child: TextField(
+                        decoration: InputDecoration(
+                          hintText: "Enter Text Here...",
+                          hintStyle: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 16,
+                          ),
+                          border: InputBorder.none,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 18),
+
+                  ElevatedButton(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: buttonColor,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 40, vertical: 14),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                    ),
+                    child: const Text(
+                      "Search",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+
+                  const Spacer(),
+                ],
+              ),
+            ),
+
+            Positioned(
+              right: 12,
+              top: 100,
+              child: Column(
+                children: [
+                  _floatingIcon(Icons.settings),
+                  const SizedBox(height: 16),
+                  _floatingIcon(Icons.favorite_border),
+                  const SizedBox(height: 16),
+                  _floatingIcon(Icons.eco_outlined),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _floatingIcon(IconData icon) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.circle,
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 4,
+            offset: Offset(0, 2),
+          )
+        ],
+      ),
+      child: Icon(icon, size: 26, color: Colors.black87),
+    );
+  }
+}
+
+// ---------------------------------------------
+// FORGOT PASSWORD SCREEN
+// ---------------------------------------------
+
+class ForgotPasswordScreen extends StatefulWidget {
+  const ForgotPasswordScreen({super.key});
+
+  @override
+  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+}
+
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+  final TextEditingController emailCtrl = TextEditingController();
+
+  void resetPassword() {
+    final email = emailCtrl.text.trim();
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please enter your email or username.")),
+      );
+      return;
+    }
+
+    // For demo, just show a confirmation snackbar and navigate back
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Password reset link sent to $email")),
+    );
+
+    Future.delayed(const Duration(seconds: 2), () {
+      Navigator.pop(context); // Back to LoginScreen
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: bgColor,
+      appBar: AppBar(
+        backgroundColor: buttonColor,
+        title: const Text("Forgot Password"),
+        centerTitle: true,
+      ),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const Text(
+                "Reset your password",
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 30),
+              Container(
+                width: 280,
+                child: TextField(
+                  controller: emailCtrl,
+                  decoration: InputDecoration(
+                    hintText: "Enter your email or username",
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    prefixIcon: const Icon(Icons.email_outlined),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 25),
+              customButton("Reset Password", resetPassword, width: 260),
+              const SizedBox(height: 20),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text(
+                  "Back to Login",
+                  style: TextStyle(color: Colors.black87, fontSize: 16),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
