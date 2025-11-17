@@ -11,7 +11,9 @@ class DigitalDinerApp extends StatelessWidget {
   }
 }
 
-// WIREFRAME 1 — User Input
+
+// SCREEN 1 — User Input
+
 class InputScreen extends StatelessWidget {
   final TextEditingController inputController = TextEditingController();
 
@@ -19,13 +21,51 @@ class InputScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFFD9F5C4),
+      appBar: AppBar(
+        backgroundColor: Color(0xFFD9F5C4),
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.favorite, color: Colors.red),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FavoritesScreen(favorites: []),
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.person, color: Colors.black),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProfileScreen(),
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.settings, color: Colors.black),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SettingsScreen(),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(25),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Logo / App Title
               Text(
                 "Digital Diner",
                 style: TextStyle(
@@ -35,8 +75,6 @@ class InputScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 40),
-
-              // Search Bar
               TextField(
                 controller: inputController,
                 decoration: InputDecoration(
@@ -48,10 +86,7 @@ class InputScreen extends StatelessWidget {
                   ),
                 ),
               ),
-
               SizedBox(height: 20),
-
-              // SEARCH BUTTON
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -63,8 +98,9 @@ class InputScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) =>
-                            SuggestionsScreen(userInput: inputController.text),
+                        builder: (context) => SuggestionsScreen(
+                          userInput: inputController.text,
+                        ),
                       ),
                     );
                   },
@@ -78,7 +114,9 @@ class InputScreen extends StatelessWidget {
   }
 }
 
-// WIREFRAME 2 — Suggestions + Search Bar + Heart Icon
+
+// SCREEN 2 — Suggestions
+
 class SuggestionsScreen extends StatefulWidget {
   final String userInput;
 
@@ -89,7 +127,7 @@ class SuggestionsScreen extends StatefulWidget {
 }
 
 class _SuggestionsScreenState extends State<SuggestionsScreen> {
-  TextEditingController searchController = TextEditingController();
+  late TextEditingController searchController; // initialized with user input
   List<String> suggestions = [
     "Thai Food",
     "BBQ",
@@ -105,8 +143,19 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
     "Burger Joint",
     "Dessert Cafe",
   ];
-
   List<String> favorites = [];
+
+  @override
+  void initState() {
+    super.initState();
+    searchController = TextEditingController(text: widget.userInput);
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +166,6 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
         elevation: 1,
         title: Text("Suggestions", style: TextStyle(color: Colors.black)),
         iconTheme: IconThemeData(color: Colors.black),
-
         actions: [
           IconButton(
             icon: Icon(Icons.favorite, color: Colors.red),
@@ -125,19 +173,40 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => FavoritesScreen(favorites: favorites),
+                  builder: (context) =>
+                      FavoritesScreen(favorites: favorites),
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.person, color: Colors.black),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProfileScreen(),
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.settings, color: Colors.black),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SettingsScreen(),
                 ),
               );
             },
           ),
         ],
       ),
-
       body: Padding(
         padding: const EdgeInsets.all(25),
         child: Column(
           children: [
-            // SEARCH BAR ON SCREEN 2
             TextField(
               controller: searchController,
               decoration: InputDecoration(
@@ -149,10 +218,7 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
                 ),
               ),
             ),
-
             SizedBox(height: 15),
-
-            // SEARCH BUTTON (STAYS ON SCREEN 2)
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -167,17 +233,13 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
                 },
               ),
             ),
-
             SizedBox(height: 20),
-
-            // KEEP ALL SUGGESTIONS ON SCREEN
             Expanded(
               child: ListView.builder(
                 itemCount: suggestions.length,
                 itemBuilder: (context, index) {
                   final suggestion = suggestions[index];
                   final isFav = favorites.contains(suggestion);
-
                   return Container(
                     margin: EdgeInsets.only(bottom: 12),
                     padding: EdgeInsets.all(18),
@@ -196,7 +258,6 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
                             color: Colors.green[900],
                           ),
                         ),
-
                         IconButton(
                           icon: Icon(
                             isFav ? Icons.favorite : Icons.favorite_border,
@@ -223,7 +284,8 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
   }
 }
 
-//   WIREFRAME 3 — Favorites
+// SCREEN 3 — Favorites (TWO SECTIONS)
+
 class FavoritesScreen extends StatelessWidget {
   final List<String> favorites;
 
@@ -239,32 +301,131 @@ class FavoritesScreen extends StatelessWidget {
         title: Text("Favorites", style: TextStyle(color: Colors.black)),
         iconTheme: IconThemeData(color: Colors.black),
       ),
-
       body: Padding(
         padding: const EdgeInsets.all(25),
-        child: favorites.isEmpty
-            ? Center(child: Text("No favorites yet"))
-            : ListView.builder(
-                itemCount: favorites.length,
-                itemBuilder: (context, index) {
-                  return Container(
-                    margin: EdgeInsets.only(bottom: 12),
-                    padding: EdgeInsets.all(18),
-                    decoration: BoxDecoration(
-                      color: Color(0xFFAED7C1),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Text(
-                      favorites[index],
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.green[900],
-                      ),
-                    ),
-                  );
-                },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Liked Restaurants",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.green[900],
               ),
+            ),
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(18),
+              margin: EdgeInsets.only(top: 12, bottom: 30),
+              decoration: BoxDecoration(
+                color: Color(0xFFAED7C1),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Text(
+                "No liked restaurants yet",
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.green[900],
+                ),
+              ),
+            ),
+            Text(
+              "Liked Categories",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.green[900],
+              ),
+            ),
+            SizedBox(height: 15),
+            Expanded(
+              child: favorites.isEmpty
+                  ? Center(
+                      child: Text(
+                        "No liked categories yet",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.green[900],
+                        ),
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: favorites.length,
+                      itemBuilder: (context, index) {
+                        return Container(
+                          margin: EdgeInsets.only(bottom: 12),
+                          padding: EdgeInsets.all(18),
+                          decoration: BoxDecoration(
+                            color: Color(0xFFAED7C1),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Text(
+                            favorites[index],
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.green[900],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// SIMPLE PROFILE SCREEN
+
+class ProfileScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color(0xFFD9F5C4),
+      appBar: AppBar(
+        backgroundColor: Color(0xFFD9F5C4),
+        elevation: 1,
+        title: Text("Profile", style: TextStyle(color: Colors.black)),
+        iconTheme: IconThemeData(color: Colors.black),
+      ),
+      body: Center(
+        child: Text(
+          "User Profile",
+          style: TextStyle(
+            fontSize: 22,
+            color: Colors.green[900],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// SIMPLE SETTINGS SCREEN
+
+class SettingsScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color(0xFFD9F5C4),
+      appBar: AppBar(
+        backgroundColor: Color(0xFFD9F5C4),
+        elevation: 1,
+        title: Text("Settings", style: TextStyle(color: Colors.black)),
+        iconTheme: IconThemeData(color: Colors.black),
+      ),
+      body: Center(
+        child: Text(
+          "Settings Page",
+          style: TextStyle(
+            fontSize: 22,
+            color: Colors.green[900],
+          ),
+        ),
       ),
     );
   }
